@@ -1,0 +1,65 @@
+qlib_init:
+  provider_uri: "~/.qlib/qlib_data/cn_data"
+  region: cn
+
+data_loader_config: &data_loader_config
+  class: StaticDataLoader
+  module_path: qlib.data.dataset.loader
+  kwargs:
+    config:
+      # feature: data/csifea.pkl
+      # label: data/csilab.pkl
+      feature: data/feature.pkl
+      label: data/label.pkl
+
+model_config: &model_config
+  input_size: 14
+  hidden_size: 256
+  num_layers: 2
+  num_heads: 2
+  use_attn: False
+  dropout: 0.1
+
+num_states: &num_states 1
+
+tra_config: &tra_config
+  num_states: *num_states
+  hidden_size: 16
+  tau: 1.0
+  src_info: LR_TPE
+
+task:
+  model:
+    class: TRAModel
+    module_path: src/model.py
+    kwargs:
+      lr: 0.0002
+      n_epochs: 500
+      max_steps_per_epoch: 100
+      early_stop: 10
+      seed: 1000
+      logdir: output/csi50/lstm_test_data2
+      model_type: LSTM
+      model_config: *model_config
+      tra_config: *tra_config
+      lamb: 1.0
+      rho: 0.99
+      freeze_model: False
+      model_init_state: 
+  dataset:
+    class: MTSDatasetH
+    module_path: src/dataset.py
+    kwargs:
+      handler:
+        class: DataHandler
+        module_path: qlib.data.dataset.handler
+        kwargs:
+          data_loader: *data_loader_config
+      segments:
+        train: [2008-02-01, 2018-12-30]
+        valid: [2019-02-01, 2020-10-30]
+        test: [2021-01-01, 2021-12-31]
+      seq_len: 20
+      horizon: 1
+      num_states: *num_states
+      batch_size: 512
