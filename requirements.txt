@@ -1,0 +1,10 @@
+json5==0.9.14
+numpy==1.24.1
+pandas==2.0.3
+torch==2.0.1+cu117
+tqdm==4.65.0
+pyqlib==0.7.1
+setuptools==57.5.0
+ruamel.yaml==0.18.5
+scikit_learn==0.23.2
+seaborn==0.12.2
